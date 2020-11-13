@@ -20,23 +20,22 @@ Simple topologoes that will be consider are :
 * Sperical Space, S1, S2, S3, ...., SN
 * PRojective Plane RP2, RP3, ... RPN
 
-Note any companct tow dimesional topolgy is derives from combinations of S2, T2, and RP2. This a deep result that will not be discussed. However this may be leveraged in time. 
+Note any compact tow dimensional topology is derives from combinations of S2, T2, and RP2. This a deep result that will not be discussed. However this may be leveraged in time. 
 
-This automa can be visualized in 1,2 and 3 dimension fathfully. Other techniques can be empoyed to visualize in higher dimesion such as graph. This becuase the essential mechanics of the evolution is based on neighborring "cell" and neighboring "entities"
+This automa can be visualized in 1,2 and 3 dimensions faithfully. Other techniques can be employed to visualize in higher dimension such as graph. This because the essential mechanics of the evolution is based on neighboring "cell" and neighboring "entities"
 
-Terms: "cell" of "simplex" is a spacial concept. In one two and three dimension the concept is clear, and it just a partitioning of space. In hight=er dimesions the concept is the same but some care needs to be applied to carry of ideas of what neighoring "cell" are and how "entities" mant trasition between cell. 
+Terms: "cell" of "simplex" is a spatial concept. In one two and three dimension the concept is clear, and it just a partitioning of space. In higher dimensions the concept is the same but some care needs to be applied to carry of ideas of what neighboring "cell" are and how "entities" transition between cell. 
 
 
 login
-create a automa
+create a automat
 
 an automa has topology, dimension, partition size
 simplex-cube
 simplex-cube has space-state
-simplex-cube possition is static but state
+simplex-cube position is static but state
 an entity(s) can inhabitant a simplex-cube
 entity has entity-state
 entity can migrate to another simplex-cube
 
 A(T,P,S(P),E1(S1),E2(S2), .... )
-
