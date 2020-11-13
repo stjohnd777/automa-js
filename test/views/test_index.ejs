@@ -1,0 +1,213 @@
+<!-- Copyright (c) 2012 Mobile Developer Solutions -->
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Test</title>
+        <meta charset="utf-8">
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <script src="bootstrap-3.2.0/js/bootstrap.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <style>
+
+            a {
+                color: #9acfea;
+            }
+
+            input[type=text], select {
+                width: 76%;
+                padding: 12px 20px;
+                margin: 8px 0;
+                display: inline-block;
+                border: 1px solid #5cb85c;
+                border-radius: 4px;
+                box-sizing: border-box;
+                background: #3c3c3c;
+            }
+
+            input[type=number], button {
+                width: 76%;
+                padding: 12px 20px;
+                margin: 8px 0;
+                display: inline-block;
+                border: 1px solid #5cb85c;
+                border-radius: 4px;
+                box-sizing: border-box;
+                background: #3c3c3c;
+            }
+
+            /* The Overlay (background) */
+            .overlay {
+                /* Height & width depends on how you want to reveal the overlay (see JS below) */
+                height: 100%;
+                width: 0;
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                left: 0;
+                top: 0;
+                background-color: rgb(0, 0, 0); /* Black fallback color */
+                background-color: rgba(0, 0, 0, 0.6); /* Black w/opacity */
+                overflow-x: hidden; /* Disable horizontal scroll */
+                transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+            }
+
+            /* Position the content inside the overlay */
+            .overlay-content {
+                position: relative;
+                top: 9%; /* 25% from the top */
+                /*width: 100%; !* 100% width *!*/
+                /*text-align: left; !* Centered text/links *!*/
+                /*margin-top: 10px; !* 30px top margin to avoid conflict with the close button on smaller screens *!*/
+                argin-left: 0px;
+                font-size: 24px;
+
+                color: #F0F3F4;
+            }
+
+            /* The navigation links inside the overlay */
+            .overlay {
+                /*padding: 8px;*/
+                /*text-decoration: none;*/
+                /*font-size: 36px;*/
+                /*color: #F0F3F4;*/
+                /*display: block; !* Display block instead of inline *!*/
+                /*transition: 0.3s; !* Transition effects on hover (color) *!*/
+            }
+
+
+            /* When you mouse over the navigation links, change their color */
+            .overlay a:hover, .overlay a:focus {
+                color: #ff0000;
+            }
+
+            /* Position the close button (top right corner) */
+            .overlay .closebtn {
+                position: absolute;
+                top: 20px;
+                right: 45px;
+                font-size: 60px;
+            }
+
+            /* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+            @media screen and (max-height: 450px) {
+                .overlay a {
+                    font-size: 20px
+                }
+
+                .overlay .closebtn {
+                    font-size: 40px;
+                    top: 15px;
+                    right: 35px;
+                }
+            }
+        </style>
+    </head>
+        <body id="body" style="background: #85929E ">
+
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Cellular Automa</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li><a onclick="openNav()"><span class="glyphicon glyphicon-th-list"></span> Define</a></li>
+                    <li><a onclick="APP.Start( 500);"><span class="glyphicon glyphicon-play"></span> Start</a></li>
+                    <li><a onclick="APP.Next( );"><span class="glyphicon glyphicon-step-forward"></span> Next</a></li>
+                    <li><a onclick="APP.Stop();"><span class="glyphicon glyphicon-stop"></span> Stop</a></li>
+                    <li><a onclick="APP.Rset();"><span class="glyphicon glyphicon-refresh"></span> Reset</a></li>
+                    <li class=".float-right"><a id="toggleFullScene"> <span class="glyphicon  glyphicon-resize-full" aria-hidden="true"/></a></li>
+                </ul>
+            </nav>
+
+            <!-- The overlay -->
+            <div id="myNav" class="overlay">
+                <!-- Button to close the overlay navigation -->
+                <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                <!-- Overlay content -->
+                <div class="overlay-content">
+
+                    <div class="form-group" id="automa_options_container" style="margin-left: 5px">
+
+                        <label for="rules">Pre Defined <span class="glyphicon glyphicon-info-sign"/></label>
+                        <select id="rules" name="rule"  onchange="manageRules()">
+                            <option value="conway" selected>Conway</option>
+                        </select>
+                        <br>
+
+
+                        <div>
+                            <label for="stepDelay">Step Delay <span class="glyphicon glyphicon-info-sign"/></label>
+                        </div>
+                        <div>
+                            <input  id="stepDelay" value='.5' type="number" id="quantity" name="stepDelay" min="0" max="3" >
+                        </div>
+
+                        <div>
+                        <label for="topology">Topology <span class="glyphicon glyphicon-info-sign"/></label>
+                        </div>
+                        <div>
+                        <select id="topology" name="topology">
+                            <option value="Torus" selected>Torus</option>
+                            <option value="Sphere">Sphere</option>
+                            <option value="RP">Projective Plane</option>
+                            <option value="FlatFence">Flat Fence</option>
+                        </select>
+                        </div>
+
+                        <br>
+                        <div style="margin-left: 20px">
+                            <label>Lengths <span class="glyphicon glyphicon-info-sign"/></label>
+                            <div>
+                                <label for="x_len0">x0:</label>
+                                <input value='7' type="number" id="quantity" name="quantity" min="0" max="11" id="x_len0">
+                            </div>
+                            <div>
+                                <label for="x_len1">x1: </label>
+                                <input value='7' type="number" id="quantity" name="quantity" min="0" max="11" id="x_len1">
+                            </div>
+                            <div>
+                                <label id="x_len2">x2:</label>
+                                <input value='7' type="number" id="quantity" name="quantity" min="0" max="11" id="x_len2">
+                            </div>
+                            <div>
+                                <button id="rest" type="button" class="btn btn-danger">Reset</button>
+                            </div>
+                        </div>
+
+                        <br>
+                        <div>
+                            <label for="defineAutoma">Define Your Automa <span class="glyphicon glyphicon-info-sign"/></label>
+                        </div>
+                        <div>
+                            <button id="defineAutoma" type="button" class="btn btn-danger">Define</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        <!--<div class="container" id="container" >-->
+        <div id="container">
+    </body>
+</html>
+
+
+<script src="dist/bundle.js"></script>
+
+<script>
+    /* Open when someone clicks on the span element */
+    function openNav() {
+        document.getElementById("myNav").style.width = "22%";
+    }
+
+    /* Close when someone clicks on the "x" symbol inside the overlay */
+    function closeNav() {
+        document.getElementById("myNav").style.width = "0%";
+    }
+
+    function manageRules() {
+        $('#define_automa').toggle();
+    }
+</script>
