@@ -1,10 +1,18 @@
-## This is a generalized automa in javascript using three.js are the view. The classic automa is Conway Game of Live. As a first pass for clarity the Caonway automa is implemented in dimension two and three. The goals of this project is a visualization and abstraction upon automas.
+## This is a generalized automa.
+
+The implemtation will be javascript. This will be a client server architecture. The view will be using three.js. The is the option to compute on the server or compute when applicable in the client. 
+
+The classic automa is Conway Game of Live. For clarity the Conway's automa is implemented in dimension two, three and N. 
+
+The goals of this project is a visualization and abstraction upon automas. To allow users to create there own rules for space, entities and there dependecies. Questions I am intereting in answering are:
 
 * what role does topolgy play in the automa
 * is the automa independent or not of the partiioning of space
 * how do autom rules change over dimesion and topology
 
-Simple topolies that will be consider are :
+Note that why this implementation seperates space form entity. Many Conway visualtion do not disinquish between the living cell and the space this cell inhabits, naturally. However in the spirt of generalizizing to allow greater flexiblity in modiing automa the view of Conaway in this implementation is an entity (living cell) inhabits a particular space (a sqare/cube/hyper-cube). The space is inert in the Conway model, and the entities state is binary, and the rules for next states is based on entity neighboor space only. Clearly one can have with a more general model even with Conway, maybe allow locomotion of the entities, add state to the space, modify the rules so the space also effects entity state, and expand on state.  
+
+Simple topologoes that will be consider are :
 
 * flat infinit space, the plane, R3, ... RN
 * flat space bounded, the sqaure, cube, ... Simple N
