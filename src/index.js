@@ -6,9 +6,9 @@ import utils from './Fullscreen.js'
 $('#toggleFullScene').click(utils.toggleFullScreen);
 
 let gridDim = 3;//2;
-let gridSizeX = 7;
-let gridSizeY = 7;
-let gridSizeZ = 7; // 1
+let gridSizeX = 4;
+let gridSizeY = 4;
+let gridSizeZ = 4; // 1
 
 function main() {
 

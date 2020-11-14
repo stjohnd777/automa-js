@@ -10,6 +10,62 @@ import { GetNextState_ConwayBinaryRule as RuleSpace } from './ConwayRules.js'
 import  {RandomBinaryRule } from './RandomBinaryRule'
 import {BinaryStateToMaterial } from './BinaryStateToMaterial'
 
+class Entity {
+    constructor(cell,state,canMigrate = false) {
+        this.cell = cell;
+        this.state = state;
+    }
+}
+
+class Cell  {
+
+    static GetNeighborCells () {
+        let cells = [];
+        return cells;
+    }
+
+    static GetNeighborResident () {
+        let cells = [];
+        return cells;
+    }
+
+    constructor(x,y,z,state,resident = undefined) {
+        this.coords = [];
+        this. state = state;
+        this.resident = resident
+    }
+
+    getResident() {
+        return this.resident;
+    }
+
+    setResident(resident){
+        this.resident = resident;
+    }
+}
+
+class LatticeState {
+
+  constructor(dim,len_x,len_y,len_z) {
+      this.map_cell = new Map();
+      Range(len_z).forEach(   z => {
+          Range(len_y).forEach(y => {
+              Range(len_x).forEach(x => {
+                  let coord = [x,y,z];
+                  let cell = new Cell(x,y,z)
+                  this.map_cell[coord] = cell;
+              })
+          })
+      })
+  }
+  addResident (x,y,z,resident) {
+      (this.map_cell[[x,y,z]]).resident = resident;
+  }
+  getResident(x,y,z) {
+      return  (this.map_cell[[x,y,z]]);
+  }
+}
+
 export const APP = {
     font : undefined,
     loadFont :async function () {
@@ -291,22 +347,25 @@ export const APP = {
                     //let coordinate = [x, y ,z];
 
                     let state = false;
-                    // if (x == 3 && y ===3) {
-                    //     state = true;
-                    // }
+                    if (x == 2 && y ===2) { // z-line
+                        state = true;
+                    }
                     let material = ComputeCellMaterialFromState(state);
                     let cubeSpace = createCube(x, y, z, material);
 
 
-                    let residentEntity = createEntity(x, y, z);
-                    let entityState = true;
-                    APP.World.entity.push(residentEntity);
-                    residentEntity = Object.assign(residentEntity,{
-                        name: `(${x},${y},${z})`,
-                        coordinate: coordinate,
-                        state: entityState,
-                    })
-                    APP.scene.add(residentEntity);
+                    let residentEntity = undefined;
+                    if (false) {
+                        residentEntity = createEntity(x, y, z);
+                        let entityState = true;
+                        APP.World.entity.push(residentEntity);
+                        residentEntity = Object.assign(residentEntity, {
+                            name: `(${x},${y},${z})`,
+                            coordinate: coordinate,
+                            state: entityState,
+                        })
+                        cubeSpace.add(residentEntity);
+                    }
 
 
                     let neighbors = ComputeNeighbors(dim, topology, coordinate, len);
@@ -361,6 +420,20 @@ export const APP = {
                 })
             })
         });
+
+
+        let compare = (a,b) => {
+             let weightA = a.x * 1000 + a.y* 100 + a.z;
+             let weightB = b.x * 1000 + b.y* 100 + b.z;
+            if (weightA < weightB) {
+                return -1;
+            }
+            if (weightA>weightB) {
+                return 1;
+            }
+            return 0;
+        }
+        APP.World.cells.sort( compare);
 
         console.log(JSON.stringify(APP.cells, ' ', 2));
 
@@ -589,9 +662,9 @@ export let createEntity = (x, y, z, entityState = {}) => {
     // m.opacity = .8;
     let c = new THREE.Mesh(geometry, m);
 
-    c.translateX(x);
-    c.translateY(y);
-    c.translateZ(z);
+    // c.translateX(x);
+    // c.translateY(y);
+    // c.translateZ(z);
 
     return c;
 };
@@ -612,28 +685,39 @@ export let ComputeNextCellState = (cube) => {
     //return RandomBinaryRule(cube);
 };
 
+let ToString = (o) =>{
+    return JSON.stringify(0,' ', 2);
+}
 export let WorldStepForward = (callback) => {
 
-    APP.World.cells.forEach(cell => {
-        let cellState = ComputeNextCellState(cell);
-        cell.state = cellState;
-        let cellMaterial = ComputeCellMaterialFromState(cellState);
-        cell.material = cellMaterial;
+    APP.World.cells.forEach((cell,index) => {
 
-        // let resident = cell.entity;
-        // resident.state = GetNextEnityState(resident);
-        // if ( resident.canRelocate ){
-        //     // resident has reference cell
-        //     // thus knows cell state
-        //     // this knows nbhr cells
-        //     // this knows nbrs cells states
-        //     // thus know resident nbhr
-        //     // thus knows resident nbhr states
-        //
-        //     // CellNextSate ( thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates )
-        //     // ResidentNextSate ( thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates )
-        //     // ApplyRelocationRule(thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates );
-        // }
+        // manage cell state
+        let cord = cell.coordinate;
+        let xyz = `(${cord.x},${cord.y},${cord.z})`
+        let newCellState = ComputeNextCellState(cell);
+        console.log(`${index}> cell${xyz}=${cell.state} |-> ${newCellState}`)
+        cell.state = newCellState;
+        let newCellMaterial = ComputeCellMaterialFromState(newCellState);
+        cell.material = newCellMaterial;
+
+        // manage resident state
+        let resident = cell.entity;
+        if ( resident) {
+            // resident.state = GetNextEnityState(resident);
+            // if (resident.canRelocate) {
+            //     // resident has reference cell
+            //     // thus knows cell state
+            //     // this knows nbhr cells
+            //     // this knows nbrs cells states
+            //     // thus know resident nbhr
+            //     // thus knows resident nbhr states
+            //
+            //     // CellNextSate ( thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates )
+            //     // ResidentNextSate ( thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates )
+            //     // ApplyRelocationRule(thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates );
+            // }
+        }
 
         //let states = ComputeNextEntityState(cell.cell.residents);
         //EnityMigrate(cell)
