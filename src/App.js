@@ -121,6 +121,7 @@ export const APP = {
     cellOffColor : '#FF0000',
     cellOpacityOff: .25,
 
+    isShowLabels : false,
     /**
      * The inner cell size, ot the inhabitant
      */
@@ -150,7 +151,7 @@ export const APP = {
         APP.camera.position.z = z;
     }
     ,
-    initOrbitControl: (container = 'container', width = window.innerWidth, height = window.innerHeight) => {
+    InitOrbitControl: (container = 'container', width = window.innerWidth, height = window.innerHeight) => {
 
         APP.renderer.setSize(width, height);
 
@@ -228,18 +229,15 @@ export const APP = {
 
         APP.camera.position.z = 15;
     }
-    ,
-    // get the call at x,y,z
-    // considering abstraction to coordinate such that coordinate
-    // is array [ x1,x2, ..., xN ]
-    // using args for example with check on length
-    getCellAt: (x, y, z) => {
-        return APP.World.cells[z * y * z + y * x + x];
-    }
-    ,
-    setTextureForCellAt: (x, y, z) => {
-        let cell = APP.cells[z * y * z + y * x + x];
-    }
+    // ,
+    // getCellAt: (x, y, z) => {
+    //     return APP.World.CellMap.get(`${x}.${y}.${z}`);
+    // }
+    // ,
+    // setTextureForCellAt: (x, y, z, material) => {
+    //     let cell = APP.getCellAt(x,y,z);
+    //     cell.material = material;
+    // }
     ,
     World: {
 
@@ -249,36 +247,35 @@ export const APP = {
         gridSizeX: undefined,
         gridSizeY: undefined,
         gridSizeZ: undefined,
-        cells: [],
-        entity: [],
-        map: new Map(),
 
+        CellMap: new Map(),
+
+        // ,
+        // getCellAt: (x, y, z) => {
+        //     return APP.World.CellMap.get(`${x}.${y}.${z}`);
+        // }
+        //,
+        setTextureForCellAt: (x, y, z, material) => {
+            let cell = APP.getCellAt(x,y,z);
+            cell.material = material;
+        }
+        ,
         getCell: (x, y, z) => {
-            let theCell = undefined;
-            for ( let cell of APP.World.cells){
-                if( cell.coordinate.x === x && cell.coordinate.y === y && cell.coordinate.z === z){
-                    theCell = cell;
-                    break;
-                }
-            }
-            return theCell;
+            return APP.World.CellMap.get(`${x}.${y}.${z}`);
+
         }
         ,
         getCellState: (x, y, z) => {
-            return  APP.World.getCell(x, y, z).state;
+            return APP.World.CellMap.get(`${x}.${y}.${z}`).state;
         }
         ,
         setCellState: (x, y, z, state, render = true) => {
-            let cell = APP.World.getCell(x, y, z);
-            cell.state = state;
-            if ( render ){
-                APP.Render();
-            }
+            APP.World.CellMap.get(`${x}.${y}.${z}`).state = state;
+            if ( render ) APP.Render();
         }
         ,
         getCellNeighbors: (x, y, z) => {
-            let cell = APP.World.getCell(x, y, z);
-            return cell.neighbors;
+            return APP.World.CellMap.get(`${x}.${y}.${z}`).neighbors;
         }
         ,
         renderCell : (x,y,z,c,opacity)=> {
@@ -288,19 +285,16 @@ export const APP = {
             cell.materialOverrideAlways = true;
         }
         ,
-        getResidents : (x,y,z) =>{
-            APP.World.getCell(x,y,z).residents;
+        getResident : (x,y,z) =>{
+            APP.World.getCell(x,y,z).resident;
         }
         ,
         seedZLine: (x = 0, y = 0) => {
             for (let index = 0; index < this.gridSizeZ; index++) {
-
                 let cell = this.getCell(x, y, index);
                 cell.state = true;
                 let m = BinaryStateToMaterial(true);
-
                 cell.material = m;
-
             }
         }
     }
@@ -318,24 +312,25 @@ export const APP = {
         APP.World.gridSizeY = gridSizeY;
         APP.World.gridSizeZ = gridSizeZ;
 
-        // try
-        // {
-        //     APP.font = await APP.loadFont();
-        //     const geometryText = new THREE.TextGeometry('TEST', {
-        //         font: APP.font,
-        //         size: 80,
-        //         height: 5,
-        //         curveSegments: 12,
-        //         bevelEnabled: true,
-        //         bevelThickness: 10,
-        //         bevelSize: 8,
-        //         bevelOffset: 0,
-        //         bevelSegments: 5
-        //     });
-        //     APP.scene.push(geometryText);
-        // }catch(e){
-        //     console.log('failed to load fonts');
-        // }
+        if ( APP.isShowLabels) {
+            try {
+                APP.font = await APP.loadFont();
+                const geometryText = new THREE.TextGeometry('TEST', {
+                    font: APP.font,
+                    size: 80,
+                    height: 5,
+                    curveSegments: 12,
+                    bevelEnabled: true,
+                    bevelThickness: 10,
+                    bevelSize: 8,
+                    bevelOffset: 0,
+                    bevelSegments: 5
+                });
+                APP.scene.push(geometryText);
+            } catch (e) {
+                console.log('failed to load fonts');
+            }
+        }
 
 
         // examine the loops for a for each, maybe range
@@ -343,24 +338,21 @@ export const APP = {
             Range(gridSizeY).forEach(   y =>  {
                 Range(gridSizeX).forEach(   x =>  {
 
-                    let coordinate = {x: x, y: y, z: z}; // shorthand but ...{x,y,z};
-                    //let coordinate = [x, y ,z];
+                    let coordinate = `${x}.${y}.${z}`;
 
-                    let state = false;
-                    if (x == 2 && y ===2) { // z-line
-                        state = true;
-                    }
-                    let material = ComputeCellMaterialFromState(state);
-                    let cubeSpace = createCube(x, y, z, material);
+                    let state = GetInitialCellState(x,y,z);
 
+                    let cubeSpace = CreateCube(x, y, z, ComputeCellMaterialFromState(state) );
+
+                    let neighbors = ComputeNeighbors(dim, topology, coordinate, len);
 
                     let residentEntity = undefined;
-                    if (false) {
-                        residentEntity = createEntity(x, y, z);
+                    if (HasInitialEntityAt(x,y,z)) {
+                        residentEntity = CreateEntity(x, y, z);
                         let entityState = true;
                         APP.World.entity.push(residentEntity);
                         residentEntity = Object.assign(residentEntity, {
-                            name: `(${x},${y},${z})`,
+                            name: 'r.'+coordinate,
                             coordinate: coordinate,
                             state: entityState,
                         })
@@ -368,10 +360,8 @@ export const APP = {
                     }
 
 
-                    let neighbors = ComputeNeighbors(dim, topology, coordinate, len);
-
                     cubeSpace = Object.assign(cubeSpace,{
-                        name: `(${x},${y},${z})`,
+                        name: 's.'+coordinate,
                         coordinate: coordinate,
                         residents: residentEntity,
                         state: state,
@@ -381,76 +371,73 @@ export const APP = {
                         materialOverrideOnce :false
                     })
 
+                    if ( APP.isShowLabels) {
+                        const geometryText = new THREE.TextGeometry(`(${x},${y},${z})`, {
+                            font: APP.font,
+                            size: 12,
+                            height: 5,
+                            curveSegments: 12,
+                            bevelEnabled: true,
+                            bevelThickness: 10,
+                            bevelSize: 8,
+                            bevelOffset: 0,
+                            bevelSegments: 5
+                        });
+                        geometryText.translateX(x);
+                        geometryText.translateY(y);
+                        geometryText.translateZ(z);
+                        cubeSpace.add(geometryText);
+                    }
 
-                    // const geometryText = new THREE.TextGeometry(`(${x},${y},${z})`, {
-                    //     font: APP.font,
-                    //     size: 12,
-                    //     height: 5,
-                    //     curveSegments: 12,
-                    //     bevelEnabled: true,
-                    //     bevelThickness: 10,
-                    //     bevelSize: 8,
-                    //     bevelOffset: 0,
-                    //     bevelSegments: 5
-                    // });
-                    // geometryText.translateX(x);
-                    // geometryText.translateY(y);
-                    // geometryText.translateZ(z);
-                    // APP.scene.push(geometryText);
-
-                    APP.World.cells.push(cubeSpace);
-                    APP.World.map [coordinate] = cubeSpace;
-
-
-                    // add to scene
+                    APP.World.CellMap.set (coordinate , cubeSpace);
 
                     APP.scene.add(cubeSpace);
 
-                    if (APP.showWire === true) {
-                        var geometryLines = new THREE.BoxGeometry(APP.cellOutlineSize, APP.cellOutlineSize, APP.cellOutlineSize);
-                        var materialLines = new THREE.MeshBasicMaterial({wireframe: true,color: '#000000'});
-                        materialLines.transparent = true;
-                        materialLines.opacity = .1;
-                        let meshLines = new THREE.Mesh(geometryLines, materialLines);
-                        meshLines.translateX(x);
-                        meshLines.translateY(y);
-                        meshLines.translateZ(z);
-                        APP.scene.add(meshLines);
-                    }
+                    // if (APP.showWire === true) {
+                    //     let geometryLines = new THREE.BoxGeometry(APP.cellOutlineSize, APP.cellOutlineSize, APP.cellOutlineSize);
+                    //     let materialLines = new THREE.MeshBasicMaterial({wireframe: true,color: '#000000'});
+                    //     materialLines.transparent = true;
+                    //     materialLines.opacity = .1;
+                    //
+                    //     let meshLines = new THREE.Mesh(geometryLines, materialLines);
+                    //     meshLines.translateX(x);
+                    //     meshLines.translateY(y);
+                    //     meshLines.translateZ(z);
+                    //     APP.scene.add(meshLines);
+                    // }
                 })
             })
         });
 
 
-        let compare = (a,b) => {
-             let weightA = a.x * 1000 + a.y* 100 + a.z;
-             let weightB = b.x * 1000 + b.y* 100 + b.z;
-            if (weightA < weightB) {
-                return -1;
-            }
-            if (weightA>weightB) {
-                return 1;
-            }
-            return 0;
-        }
-        APP.World.cells.sort( compare);
+        // let compare = (a,b) => {
+        //      let weightA = a.x * 1000 + a.y* 100 + a.z;
+        //      let weightB = b.x * 1000 + b.y* 100 + b.z;
+        //     if (weightA < weightB) {
+        //         return -1;
+        //     }
+        //     if (weightA>weightB) {
+        //         return 1;
+        //     }
+        //     return 0;
+        // }
+        // APP.World.cells.sort( compare);
 
-        console.log(JSON.stringify(APP.cells, ' ', 2));
+        //console.log(JSON.stringify(APP.cells, ' ', 2));
 
 
         /**
          * Shows (x,y,z) axis lines
          */
         if (APP.showAxis === true) {
-            var axisHelper = new THREE.AxisHelper(2 * len); // TODO : sort our length
-            APP.scene.add(axisHelper);
+            APP.scene.add(new THREE.AxisHelper(20));
         }
 
         /**
          * Shows xy plane as gird
          */
         if (APP.showPlane === true) {
-            let size = 100;  // TODO " sort out length
+            let size = 100;
             let divisions = 100;
             let gridHelper = new THREE.GridHelper(size, divisions);
             APP.scene.add(gridHelper);
@@ -475,7 +462,7 @@ export const APP = {
         // background color
         APP.renderer.setClearColor(APP.backgroundColor);
 
-        APP.World.cells.forEach(cell => {
+        APP.World.CellMap.forEach((cell,coordinate) => {
 
             if (APP.showOffCell === false){
                 cell.material.opacity = 0;
@@ -490,6 +477,10 @@ export const APP = {
             }
             cell.material = ComputeCellMaterialFromState(cell.state);
 
+            if ( cell.resident ) {
+                cell.material = ComputeResidentMaterialFromState(cell.resident.state);
+            }
+
         });
 
         // THREE render
@@ -503,14 +494,15 @@ export const APP = {
      * Clear the Geometry
      */
     clearGeometry: () => {
-        const len = this.cells.length;
-        this.cells.forEach(cell => cell.dispose());
-        this.cells = [];
+        APP.World.CellMap.forEach((cell,coordinate) => cell.dispose());
+        APP.World.CellMap = new Map();
+
     }
     ,
 
     Next: () => {
         WorldStepForward((err, next) => {
+            // do some visual and sound
         });
     }
     ,
@@ -538,6 +530,16 @@ export const APP = {
     }
 };
 
+export let GetInitialCellState = (x,y,z) => {
+    let state = false;
+    if (x == 2 && y ===2) { // z-line
+        state = true;
+    }
+    return state;
+}
+export let HasInitialEntityAt = (x,y,z)=>{
+    return false;
+}
 
 async function load_text() {
     const loader = new THREE.FontLoader();
@@ -561,7 +563,7 @@ async function load_text() {
  * @param z
  * @returns {THREE.Mesh}
  */
-export let createCube = (x, y, z, material) => {
+export let CreateCube = (x, y, z, material) => {
     // the create a cube
     // geometry + material => mesh = cube
     let geometry = new THREE.BoxGeometry(APP.cellSize, APP.cellSize, APP.cellSize);
@@ -652,31 +654,33 @@ export let createCubeOutLine = (x, y, z) => {
  * @param entityState
  * @returns {{state: {}, home: *}}
  */
-export let createEntity = (x, y, z, entityState = {}) => {
-
+export let CreateEntity = (x, y, z, entityState = {}) => {
     let geometry = new THREE.SphereGeometry(  .25, 32, 32 );
-    //BoxGeometry(.8 * APP.cellSize, .8 * APP.cellSize, .8 * APP.cellSize);
     let color = new THREE.Color('#7a66ff');
     let m = new THREE.MeshBasicMaterial({color: color});
     // m.transparent = true;
     // m.opacity = .8;
     let c = new THREE.Mesh(geometry, m);
-
-    // c.translateX(x);
-    // c.translateY(y);
-    // c.translateZ(z);
-
     return c;
 };
 
 
 
-export let ComputeCellMaterialFromState = (cellState) => {
+export let ComputeCellMaterialFromState = (atate) => {
     //TODO : look up state implementation of
     // switch on state enum
-    return BinaryStateToMaterial(cellState);
+    let material =  BinaryStateToMaterial(atate);
+    material.wireframe = APP.showWire;
+    return material;
 };
 
+export let ComputeResidentMaterialFromState = (state) => {
+    //TODO : look up state implementation of
+    // switch on state enum
+    let material =  BinaryStateToMaterial(state);
+    material.wireframe = APP.showWire;
+    return material;
+};
 
 export let ComputeNextCellState = (cube) => {
 
@@ -685,44 +689,32 @@ export let ComputeNextCellState = (cube) => {
     //return RandomBinaryRule(cube);
 };
 
+export let ComputeNextEntityState = (cube) => {
+    return RuleSpace(cube);
+
+};
+
 let ToString = (o) =>{
     return JSON.stringify(0,' ', 2);
 }
 export let WorldStepForward = (callback) => {
 
-    APP.World.cells.forEach((cell,index) => {
-
-        // manage cell state
-        let cord = cell.coordinate;
-        let xyz = `(${cord.x},${cord.y},${cord.z})`
-        let newCellState = ComputeNextCellState(cell);
-        console.log(`${index}> cell${xyz}=${cell.state} |-> ${newCellState}`)
-        cell.state = newCellState;
-        let newCellMaterial = ComputeCellMaterialFromState(newCellState);
-        cell.material = newCellMaterial;
-
-        // manage resident state
-        let resident = cell.entity;
-        if ( resident) {
-            // resident.state = GetNextEnityState(resident);
-            // if (resident.canRelocate) {
-            //     // resident has reference cell
-            //     // thus knows cell state
-            //     // this knows nbhr cells
-            //     // this knows nbrs cells states
-            //     // thus know resident nbhr
-            //     // thus knows resident nbhr states
-            //
-            //     // CellNextSate ( thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates )
-            //     // ResidentNextSate ( thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates )
-            //     // ApplyRelocationRule(thisCellsCurrentStat, thisCellsCurrentResidentState, nbhrCellCurrentStates, nbhrResidentCurrentStates );
-            // }
+    APP.World.CellMap.forEach((cell,key)=>{
+        cell.next_state = ComputeNextCellState(cell);
+        if (cell.resident) {
+            cell.resident.next_state = ComputeNextEntityState(cell.resident);
+            // TODO : Handle resident migration
         }
+    })
 
-        //let states = ComputeNextEntityState(cell.cell.residents);
-        //EnityMigrate(cell)
+    APP.World.CellMap.forEach((cell,key)=>{
+        cell.state = cell.next_state;
+        if (cell.resident) {
+            cell.resident.state = cell.resident.next_state
+            // TODO : Handle resident migration
+        }
+    })
 
-    });
     if (callback) {
         callback(undefined, true);
     }

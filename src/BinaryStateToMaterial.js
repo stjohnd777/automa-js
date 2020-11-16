@@ -3,6 +3,8 @@ import {APP} from "./App";
 
 export function BinaryStateToMaterial(cellState) {
 
+    // TODO : Add wireframe support to the material with
+    // wireframe: APP.showWire
     let color = undefined;
     if (cellState === true) {
         color = new THREE.Color(APP.cellOnColor);//'#117a65')

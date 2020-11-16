@@ -278,6 +278,9 @@
                     <button id="btnPoke" type="button" class="btn btn-success" onclick="pokeState()">Set State</button>
 
                     <button id="btnNbhrs" type="button" class="btn btn-success" onclick="getNBHRS()">NBHRS</button>
+
+                    <button id="btnAllOn" type="button" class="btn btn-success" onclick="WalkOn()">WalkOn</button>
+                    <button id="btnAllOff" type="button" class="btn btn-success" onclick="WalkOff()">WalkOff</button>
                 </div>
 
                 <script>
@@ -301,8 +304,23 @@
                             console.log(n);
                         })
                         //APP.Render();
+                    }
 
+                    function WalkOn (){
+                        SetStateOnAll(true);
+                    }
+                    function WalkOff (){
+                        SetStateOnAll(false);
+                    }
 
+                    function SetStateOnAll(state){
+                        for ( let x =0; x < APP.World.gridSizeX ; x++){
+                            for ( let y =0 ; y < APP.World.gridSizeY ; y++){
+                                for ( let z =0 ; z < APP.World.gridSizeX ; z++){
+                                    APP.World.setCellState(x,y,z,state)
+                                }
+                            }
+                        }
                     }
                 </script>
             </div>

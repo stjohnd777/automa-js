@@ -2,7 +2,7 @@
 // This is really Compute Next State
 import {APP} from "./App";
 
-export let GetNextState_ConwayBinaryRule = (cube) => {
+export let GetNextState_ConwayBinaryRule = (cell) => {
 
     // conway can be seen as
     // as inert space, not state => no rules
@@ -12,7 +12,7 @@ export let GetNextState_ConwayBinaryRule = (cube) => {
     // state transition  0|-> 1 when | LivingNBBR =3  1|->0  LivingNBBR not 2 or 3
     let state = false;
     // a living cell with one neighbor dies
-    // a living cell with 2 or 3 neighbors lives oo
+    // a living cell with 2 or 3 neighbors lives on
     // a living call with 4 or more neighbors dies
     // a dead cell with exactly three become alive
 
@@ -21,25 +21,17 @@ export let GetNextState_ConwayBinaryRule = (cube) => {
     // Any live cell with more than three live neighbours dies, as if by overpopulation.
     // Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
-    let livingNbhrCount = 0;
+    let living_neighbors = 0;
 
-    cube.neighbors.forEach(aNbhrCord => {
-        let cell = APP.World.getCell(aNbhrCord.x, aNbhrCord.y, aNbhrCord.z);
+    cell.neighbors.forEach(aNeighborCoordinate => {
+        let cell = APP.World.getCell(aNeighborCoordinate.x, aNeighborCoordinate.y, aNeighborCoordinate.z);
         if (cell.state === true) {
-            livingNbhrCount++;
+            living_neighbors++;
         }
     });
 
-    let isAlive = cube.state;
-    if (isAlive) {
-        if (livingNbhrCount === 2 || livingNbhrCount === 3) {
-            state = true;
-        } else {
-            state = false;
-        }
-    } else {
-        state = (livingNbhrCount === 3);
-    }
+    state = cell.state ?  (living_neighbors === 2 || living_neighbors === 3) : (living_neighbors === 3);
+
     return state;
 };
 

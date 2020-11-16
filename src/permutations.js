@@ -39,16 +39,21 @@ export let ComputePermutations2 = () => {
     });
     return deltaVectors;
 }
+
+// TODO : refactor signatures , maybe
 export let ComputeNeighbors = (dim, topology, cord, latticeSize) => {
 
-    let nbhrs = [];
+    cord = cord.split('.');
+    cord = {x: parseInt(cord[0]), y: parseInt(cord[1]), z: parseInt(cord[2])}
+
+    let neighbor_coordinates = [];
 
     if (dim == 2) {
         let deltaVectors = ComputePermutations2();
         deltaVectors.forEach(delta => {
-            nbhrs.push({
-                x:  ApplyTopology(cord.x + delta.dx, topology, latticeSize),
-                y:  ApplyTopology(cord.y + delta.dy, topology, latticeSize)
+            neighbor_coordinates.push({
+                x: ApplyTopology(cord.x + delta.dx, topology, latticeSize),
+                y: ApplyTopology(cord.y + delta.dy, topology, latticeSize)
             });
         });
     }
@@ -61,13 +66,13 @@ export let ComputeNeighbors = (dim, topology, cord, latticeSize) => {
             let y = cord.y + delta.dy;
             let z = cord.z + delta.dz;
 
-            let xx =  ApplyTopology(x, topology, latticeSize);
-            let yy =  ApplyTopology(y, topology, latticeSize);
-            let zz =  ApplyTopology(z, topology, latticeSize);
+            let xx = ApplyTopology(x, topology, latticeSize);
+            let yy = ApplyTopology(y, topology, latticeSize);
+            let zz = ApplyTopology(z, topology, latticeSize);
 
             let normalized_cord = {x: xx, y: yy, z: zz}
 
-            nbhrs.push(normalized_cord);
+            neighbor_coordinates.push(normalized_cord);
         });
     }
 
@@ -82,7 +87,7 @@ export let ComputeNeighbors = (dim, topology, cord, latticeSize) => {
     //     });
     // }
 
-    return nbhrs;
+    return neighbor_coordinates;
 }
 
 export let TOPOLOGY = {
