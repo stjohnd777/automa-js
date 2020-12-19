@@ -1,6 +1,7 @@
 import {APP} from './App.js';
 import {TOPOLOGY} from './permutations.js'
 import utils from './Fullscreen.js'
+import * as dat from "dat.gui";
 
 
 $('#toggleFullScene').click(utils.toggleFullScreen);
@@ -9,6 +10,8 @@ let gridDim = 3;//2;
 let gridSizeX = 10;
 let gridSizeY = 10;
 let gridSizeZ = 10; // 1
+
+import * as dat from 'dat.gui';
 
 function main() {
 
@@ -26,6 +29,9 @@ function main() {
     APP.Render();
     // APP.Start( 500);
     window.APP = APP;
+
+    const gui = new dat.GUI();
+    window.dat = dat
 }
 
 main();

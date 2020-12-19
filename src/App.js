@@ -9,65 +9,14 @@ import { ComputeNeighbors} from './permutations.js'
 import { GetNextState_ConwayBinaryRule as RuleSpace } from './ConwayRules.js'
 import  {RandomBinaryRule } from './RandomBinaryRule'
 import {BinaryStateToMaterial } from './BinaryStateToMaterial'
+import * as dat from 'dat.gui';
 
-class Entity {
-    constructor(cell,state,canMigrate = false) {
-        this.cell = cell;
-        this.state = state;
-    }
-}
 
-class Cell  {
-
-    static GetNeighborCells () {
-        let cells = [];
-        return cells;
-    }
-
-    static GetNeighborResident () {
-        let cells = [];
-        return cells;
-    }
-
-    constructor(x,y,z,state,resident = undefined) {
-        this.coords = [];
-        this. state = state;
-        this.resident = resident
-    }
-
-    getResident() {
-        return this.resident;
-    }
-
-    setResident(resident){
-        this.resident = resident;
-    }
-}
-
-class LatticeState {
-
-  constructor(dim,len_x,len_y,len_z) {
-      this.map_cell = new Map();
-      Range(len_z).forEach(   z => {
-          Range(len_y).forEach(y => {
-              Range(len_x).forEach(x => {
-                  let coord = [x,y,z];
-                  let cell = new Cell(x,y,z)
-                  this.map_cell[coord] = cell;
-              })
-          })
-      })
-  }
-  addResident (x,y,z,resident) {
-      (this.map_cell[[x,y,z]]).resident = resident;
-  }
-  getResident(x,y,z) {
-      return  (this.map_cell[[x,y,z]]);
-  }
-}
 
 export const APP = {
+
     font : undefined,
+
     loadFont :async function () {
         const loader = new THREE.FontLoader();
         return new Promise((resolve,reject)=>{
@@ -297,6 +246,24 @@ export const APP = {
                 cell.material = m;
             }
         }
+        ,
+        seedYLine: (x = 0, z = 0) => {
+            for (let index = 0; index < this.gridSizeZ; index++) {
+                let cell = this.getCell(x, index, z);
+                cell.state = true;
+                let m = BinaryStateToMaterial(true);
+                cell.material = m;
+            }
+        }
+        ,
+        seedXLine: (y = 0, z = 0) => {
+            for (let index = 0; index < this.gridSizeZ; index++) {
+                let cell = this.getCell(index, y, z);
+                cell.state = true;
+                let m = BinaryStateToMaterial(true);
+                cell.material = m;
+            }
+        }
     }
     ,
     /**
@@ -409,23 +376,6 @@ export const APP = {
             })
         });
 
-
-        // let compare = (a,b) => {
-        //      let weightA = a.x * 1000 + a.y* 100 + a.z;
-        //      let weightB = b.x * 1000 + b.y* 100 + b.z;
-        //     if (weightA < weightB) {
-        //         return -1;
-        //     }
-        //     if (weightA>weightB) {
-        //         return 1;
-        //     }
-        //     return 0;
-        // }
-        // APP.World.cells.sort( compare);
-
-        //console.log(JSON.stringify(APP.cells, ' ', 2));
-
-
         /**
          * Shows (x,y,z) axis lines
          */
@@ -452,7 +402,6 @@ export const APP = {
     Render: () => {
 
         requestAnimationFrame(APP.Render);
-
 
         // APP.world.cells.forEach( cell=>{
         //    cell.rotation.x += .01;
@@ -529,6 +478,7 @@ export const APP = {
 
     }
 };
+
 
 export let GetInitialCellState = (x,y,z) => {
     let state = false;
