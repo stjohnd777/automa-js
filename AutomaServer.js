@@ -22,6 +22,12 @@ let router = express.Router();
 router.get('/', function(req, res, next) {
     res.render('index', { title: 'Express' });
 });
+router.get('/1d', function(req, res, next) {
+    res.render('index1d', { title: 'Express' });
+});
+router.get('/2d', function(req, res, next) {
+    res.render('index2d', { title: 'Express' });
+});
 app.use(router);
 
 const loginRoute = require('./routs/loginRoute');

@@ -5,7 +5,7 @@
     <title>Automa by Daniel St. John</title>
     <meta charset="utf-8">
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="bootstrap-3.2.0/js/bootstrap.min.js"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -143,6 +143,7 @@
 <div id="myNav" class="overlay">
     <!-- Button to close the overlay navigation -->
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">close</a>
+
     <!-- Overlay content -->
     <div class="overlay-content">
 
@@ -155,12 +156,14 @@
                     <option value="brain">Brain&Vote</option>
                 </select>
 
-
                 <div>
                     <label for="defineAutoma">Define Your Automa <span class="glyphicon glyphicon-info-sign"/></label>
                 </div>
                 <div>
                     <button id="defineAutoma" type="button" class="btn btn-success">Define</button>
+                    <script>
+                        $('#defineAutoma').click( (e)=>{alert('Define Automa Not Implemented Yet')})
+                    </script>
                 </div>
             </div>
 
@@ -283,6 +286,7 @@
                 </div>
 
                 <script>
+
                     function pokeState() {
                         let x = parseInt(document.getElementById("c0").value)
                         let y = parseInt(document.getElementById("c1").value)
@@ -333,7 +337,7 @@
 
                     <input id="sceneBackgroundColor" type="color" name="sceneBackgroundColor" value="#e66465"
                            onchange="handleBgColorOnChange()">
-                    <label for="sceneBackground">Background Color</label>
+                    <label for="sceneBackgroundColor">Background Color</label>
 
                     <div>
                         <input id="showPlane" type="checkbox" name="showPlane" value="false"
@@ -478,56 +482,41 @@
 <div id="container">
 
 
-    <!--    <nav class="navbar navbar-inverse navbar-fixed-bottom">-->
-
-    <!--&lt;!&ndash;        <ul class="nav navbar-nav">&ndash;&gt;-->
-    <!--&lt;!&ndash;            <li><a onclick="tooggl()"><span class="glyphicon glyphicon-th-list"></span> Define</a></li>&ndash;&gt;-->
-    <!--&lt;!&ndash;            <li><a onclick="APP.Start( GetStepDelay() );"><span class="glyphicon glyphicon-play"></span> Start</a></li>&ndash;&gt;-->
-    <!--&lt;!&ndash;            <li><a onclick="APP.Next( );"><span class="glyphicon glyphicon-step-forward"></span> Next</a></li>&ndash;&gt;-->
-    <!--&lt;!&ndash;            <li><a onclick="APP.Stop();"><span class="glyphicon glyphicon-stop"></span> Stop</a></li>&ndash;&gt;-->
-    <!--&lt;!&ndash;            <li><a onclick="APP.Reset();"><span class="glyphicon glyphicon-refresh"></span> Reset</a></li>&ndash;&gt;-->
-    <!--&lt;!&ndash;            <li class=".float-right"><a id="toggleFullScene"> <span class="glyphicon  glyphicon-resize-full"&ndash;&gt;-->
-    <!--&lt;!&ndash;                                                                    aria-hidden="true"/></a></li>&ndash;&gt;-->
-    <!--&lt;!&ndash;        </ul>&ndash;&gt;-->
-
-    <!--    </nav>-->
 </body>
 </html>
 
 
 <script src="dist/bundle.js"></script>
 
-<script>
-    let UI = {
-        isRightMenuVisible: false
-    }
+<!--<script>-->
+<!--    -->
+<!--    /* Open when someone clicks on the span element */-->
+<!--    function openNav() {-->
+<!--        document.getElementById("myNav").style.width = "20%";-->
+<!--    }-->
 
-    /* Open when someone clicks on the span element */
-    function openNav() {
-        document.getElementById("myNav").style.width = "20%";
-    }
+<!--    /* Close when someone clicks on the "x" symbol inside the overlay */-->
+<!--    function closeNav() {-->
+<!--        document.getElementById("myNav").style.width = "0%";-->
+<!--    }-->
 
-    /* Close when someone clicks on the "x" symbol inside the overlay */
-    function closeNav() {
-        document.getElementById("myNav").style.width = "0%";
-    }
+<!--    function toggleRightMenu() {-->
+<!--        UI.isRightMenuVisible = !UI.isRightMenuVisible-->
+<!--        UI.isRightMenuVisible ? openNav() : closeNav();-->
+<!--    }-->
 
-    function toggleRightMenu() {
-
-        UI.isRightMenuVisible = !UI.isRightMenuVisible
-        UI.isRightMenuVisible ? openNav() : closeNav();
-
-
-    }
-
-    function GetStepDelay() {
-        return $('#stepDelay').val();
-    }
+<!--    function GetStepDelay() {-->
+<!--        return $('#stepDelay').val();-->
+<!--    }-->
 
 
-    function manageRules() {
-        $('#define_automa').toggle();
-    }
+<!--    function manageRules() {-->
+<!--        $('#define_automa').toggle();-->
+<!--    }-->
 
-    const gui = new dat.GUI();
-</script>
+
+<!--    let UI = {-->
+<!--        isRightMenuVisible: false-->
+<!--    }-->
+<!--    // const gui = new dat.GUI();-->
+<!--</script>-->
