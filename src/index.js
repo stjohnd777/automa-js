@@ -10,7 +10,7 @@ $('#toggleFullScene').click(utils.toggleFullScreen);
 let gridDim = 3;//2;
 let gridSizeX = 10;
 let gridSizeY = 10;
-let gridSizeZ = 1; // 1
+let gridSizeZ = 10; // 1
 
 import * as dat from 'dat.gui';
 
